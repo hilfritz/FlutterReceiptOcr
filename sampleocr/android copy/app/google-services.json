@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "822522955675",
+    "firebase_url": "https://flutterreceiptocr.firebaseio.com",
+    "project_id": "flutterreceiptocr",
+    "storage_bucket": "flutterreceiptocr.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822522955675:android:603f98eaad0ae7e025033e",
+        "android_client_info": {
+          "package_name": "com.example.sampleocr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822522955675-v60b3vvaps3tkd9eo9m1tu25ni6b5s9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7S3j-SeaUCCRRU1YMLIRHDqJdhWRLLWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822522955675-v60b3vvaps3tkd9eo9m1tu25ni6b5s9h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
