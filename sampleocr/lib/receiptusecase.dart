@@ -66,16 +66,25 @@ class ReceiptUseCaseImpl implements ReceiptUseCase{
       }
     }
 
-    if (receipt!=null){
-      if (
-      receipt.priceList==null ||
-          receipt.nameList==null ||
-          receipt.dateList==null
-      ){
-        view.hideLoading();
-        //SHOW ERROR MESSAGE
-        return;
-      }
+    //CLEAR THE LISTS
+    view.priceList.add(new List<String>());
+    view.nameList.add(new List<String>());
+    view.dateList.add(new List<String>());
+
+    view.selectedDate = "";
+    view.selectedName = "";
+    view.selectedPrice = "";
+
+    if (receipt.priceList.isNotEmpty){
+      view.priceList.add(receipt.priceList);
+    }
+
+    if (receipt.nameList.isNotEmpty){
+      view.nameList.add(receipt.nameList);
+    }
+
+    if (receipt.dateList.isNotEmpty){
+      view.dateList.add(receipt.dateList);
     }
 
 

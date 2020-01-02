@@ -41,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
   File _image;
   String _ocrResult = "";
   TextRecognizer textRecognizer = FirebaseVision.instance.textRecognizer();
-  ReceiptUseCase receiptUseCaseView = new ReceiptUseCaseImpl();
+  ReceiptUseCase receiptUseCase = new ReceiptUseCaseImpl();
 
   @override
   PublishSubject<List<String>> dateList;
@@ -62,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
     if (textRecognizer==null){
       textRecognizer = FirebaseVision.instance.textRecognizer();
     }
+    receiptUseCase.init(this);
     super.initState();
   }
 
@@ -78,42 +79,7 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
     });
     FirebaseVisionImage visionImage = FirebaseVisionImage.fromFile(image);  
     final VisionText visionText = await textRecognizer.processImage(visionImage);
-    String text = visionText.text;
-
-    print(">> "+text);
-    var parsed = _receiptParser.getParsedReceiptFromString(text, "\n");
-    parsed = _receiptParser.getParsedReceiptFromVisionText(visionText);
-
-
-    //print(temp);
-    String temp = "";
-    temp = text;
-    print("==========DATES=========");
-    print(parsed.dateList);
-    print("==========NAMES=========");
-    print(parsed.nameList);
-    print("==========PRICES=========");
-    print(parsed.priceList);
-
-    //temp = parsed;
-    for (TextBlock block in visionText.blocks) {
-      final Rect boundingBox = block.boundingBox;
-      final List<Offset> cornerPoints = block.cornerPoints;
-      final String text = block.text;
-      final List<RecognizedLanguage> languages = block.recognizedLanguages;
-      //temp+=text+"\n";
-      for (TextLine line in block.lines) {
-        // Same getters as TextBlock
-        //temp += "\n";
-        for (TextElement element in line.elements) {
-          // Same getters as TextBlock
-          //temp += element.text+" ";
-        }
-      }
-    }
-    setState(() {
-      _ocrResult = temp;
-    });
+    receiptUseCase.run(visionText);
   }
 
   @override
@@ -133,13 +99,98 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
 
     double receiptWidthHeight = 0;
     double textFieldWidth = 0;
+    double shorterDimention = 0;
     if (width<height){
       receiptWidthHeight = width * 0.5;
+      shorterDimention = width;
     }else{
       receiptWidthHeight = height * 0.5;
+      shorterDimention = height;
     }
 
     textFieldWidth = receiptWidthHeight;
+    double labelWidth = shorterDimention * 0.25;
+    double remarkWidth = shorterDimention * 0.65;
+    double dropdownWidth = shorterDimention * 0.1;
+
+
+    var firstRow = getColumn(TextEditingController(), "Date:", "Enter or Select Date", dateList.stream, selectedDate);
+    var secodRow = getColumn(TextEditingController(), "Remark:", "Enter or Select Remark",  nameList.stream, selectedName);
+    var thirdRow = getColumn(TextEditingController(), "Price:", "Enter or Select Price", priceList.stream, selectedPrice);
+    /*
+    var firstRow = Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      flex: 10,
+                      child: Text("Date:")
+                      ),
+                    Expanded(
+                      flex: 60,
+                          child: TextField(
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Enter date'
+                          ),
+                        ),
+                    )
+                   ,
+                    Expanded(
+                      flex: 20,
+                      child: getDropdownStreamBuilder(dateList.stream, "", selectedDate)),
+                  ],
+                );
+
+
+    var secodRow = Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Text("Remark:"
+                    ),
+                    SizedBox(
+                      width: textFieldWidth,
+                      child:  TextField(
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Enter remark'
+                        ),
+                      ),
+                    )
+                    ,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        getDropdownStreamBuilder(nameList.stream, "", selectedName),
+                      ],
+                    ),
+                  ],
+                );
+    var thirdRow = Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Text("Price:"),
+                    SizedBox(
+                      width: textFieldWidth,
+                      child:  TextField(
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Enter price'
+                        ),
+                      ),
+                    )
+                    ,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        getDropdownStreamBuilder(priceList.stream, "", selectedPrice),
+                      ],
+                    ),
+                  ],
+                );
+    */
 
     return Scaffold(
       appBar: AppBar(        
@@ -153,63 +204,9 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
                 : Image.file(_image, width: receiptWidthHeight, height: receiptWidthHeight,),
                 Text("")
             ,
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    SizedBox(
-                      width: textFieldWidth,
-                      child:  TextField(
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter date'
-                        ),
-                      ),
-                    )
-                   ,
-                    Text("∇"),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    SizedBox(
-                      width: textFieldWidth,
-                      child:  TextField(
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter remark'
-                        ),
-                      ),
-                    )
-                    ,
-                    Text("∇"),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    SizedBox(
-                      width: textFieldWidth,
-                      child:  TextField(
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Enter price'
-                        ),
-                      ),
-                    )
-                    ,
-                    Text("∇"),
-                  ],
-                ),
-
-              ],
-            )
+            firstRow,
+            secodRow,
+            thirdRow
           ],
         ),
       ),
@@ -222,21 +219,72 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
   }
 
 
-  Widget buildDropwDown(List<String> list, String hint, String selected) {
-    List<DropdownMenuItem> dropdownMenuItemList = List.generate(list.length, (i){
+  Widget getColumn(TextEditingController controller, String label, String hint, Stream stream, String selected){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+            flex: 15,
+            child: Text(label,  textAlign: TextAlign.left,)
+        ),
+        Expanded(
+          flex: 50,
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: hint
+            ),
+          ),
+        )
+        ,
+        Expanded(
+            flex: 20,
+            child: getDropdownStreamBuilder(stream, "", selected, controller)),
+      ],
+    );
+  }
+
+  Widget getDropdownStreamBuilder(Stream stream, String hint, String selected, TextEditingController controller){
+    return StreamBuilder<List<String>>(
+      stream: stream,
+      builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+        if (snapshot.hasData){
+          return buildDropwDown(snapshot.data, hint, selected, controller);
+        }
+        return Text("-",  textAlign: TextAlign.left,style: TextStyle(color: Colors.red), textDirection: TextDirection.ltr);
+
+      },
+    );
+  }
+
+  Widget buildDropwDown(List<String> list, String hint, String selected, TextEditingController controller) {
+    List<DropdownMenuItem<String>> dropdownMenuItemList = List.generate(list.length, (i){
       return DropdownMenuItem<String>(
-        child: Text(list[i]),
+        child: Text(
+            list[i],
+            textAlign: TextAlign.left,
+            style: TextStyle(color: Colors.blueGrey)),
         value: i.toString(),
       );
     });
     DropdownButton<String> dropdownButton = new DropdownButton(items: dropdownMenuItemList,
         isExpanded: false,
+        isDense: true,
         onChanged: (String val) {
-          selected = val;
+          selected = list[int.parse(val)];
+          controller.text = selected;
         },
-        hint: Text(hint));
 
-    return dropdownButton;
+        hint: Text(hint, textAlign: TextAlign.left, style: TextStyle(color: Colors.redAccent)));
+
+    //return dropdownButton;
+
+    //https://github.com/flutter/flutter/issues/16606
+    return DropdownButtonHideUnderline(
+      child: dropdownButton
+    );
 
 
   }

@@ -17,15 +17,22 @@ class ReceiptParser{
   bool distinct = true;
   RegExp regMMDDYYYY = new RegExp(r"^\d{2}-\d{2}-\d{4}$");
   RegExp regDDMMYYYY = new RegExp(r"^\d{2}-\d{2}-\d{4}$");
+  RegExp regDDMMYY = new RegExp(r"^\d{2}-\d{2}-\d{2}$");
+  RegExp regMMDDYY = new RegExp(r"^\d{2}-\d{2}-\d{2}$");
+
 
   Receipt getParsedReceiptFromVisionText(VisionText visionText){
     Receipt retVal = new Receipt();
+    List<String> totals = new List<String>();
     for (TextBlock block in visionText.blocks) {
       //final Rect boundingBox = block.boundingBox;
       //final List<Offset> cornerPoints = block.cornerPoints;
       final String text = block.text;
       final List<RecognizedLanguage> languages = block.recognizedLanguages;
       //temp+=text+"\n";
+      
+
+      
       for (TextLine line in block.lines) {
         // Same getters as TextBlock
         //temp += "\n";
@@ -39,21 +46,24 @@ class ReceiptParser{
         }else{
           retVal.nameList.add(item);
         }
-        //for (TextElement element in line.elements) {
-          // Same getters as TextBlock
-          //temp += element.text+" ";
-          //print("getParsedReceiptFromVisionText: "+element.text);
-        //}
       }
-      //if (distinct){
-        retVal.nameList = retVal.nameList.toSet().toList();
-        retVal.dateList = retVal.dateList.toSet().toList();
-        retVal.priceList = retVal.priceList.toSet().toList();
-      //}
+      retVal.nameList = retVal.nameList.toSet().toList();
+      retVal.dateList = retVal.dateList.toSet().toList();
+      retVal.priceList = retVal.priceList.toSet().toList();
       if (retVal.dateList.length==0){
         retVal.dateList.addAll(getDatesFromVisionText(visionText));
       }
+      if (retVal.priceList.isEmpty && totals.isNotEmpty){
+        totals = totals.reversed;
+        retVal.priceList.addAll(totals);
+      }else if (retVal.priceList.isNotEmpty==true && totals.isNotEmpty){
+        totals = totals.reversed;
+        retVal.priceList.insertAll(0, totals);
+      }
+
+
     }
+    //totals = getTotalsFromVisionText(visionText);
 
 
     return retVal;
@@ -84,8 +94,46 @@ class ReceiptParser{
     return retVal;
   }
 
+  List<String> getTotalsFromVisionText(VisionText visionText){
+    List<String> retVal = new List<String>();
+    print("getTotalsFromVisionText: ");
+    int blockCout = 0;
+    for (TextBlock block in visionText.blocks) {
+
+      //final Rect boundingBox = block.boundingBox;
+      //final List<Offset> cornerPoints = block.cornerPoints;
+
+      final String blockText = block.text;
+      print("getTotalsFromVisionText: ["+blockCout.toString()+"] "+blockText);
+      if (blockText.contains("total")){
+        //print("getTotalsFromVisionText: "+blockText);
+        for (TextLine line in block.lines) {
+          //print("getTotalsFromVisionText: line.text: "+line.text);
+          if (line.text.contains("total")){
+            //print("getTotalsFromVisionText: line.text: "+line.text);
+            for (TextElement element in line.elements) {
+              // Same getters as TextBlock
+              //temp += element.text+" ";
+              //print("getTotalsFromVisionText: textelement "+element.text);
+              if (isDateString(element.text)){
+                retVal.add(element.text);
+              }
+            }
+          }
+
+        }
+      }
+
+      blockCout++;
+      retVal = retVal.toSet().toList();
+    }
 
 
+    return retVal;
+  }
+
+
+  /*
   Receipt getParsedReceiptFromString(String str, String splitter){
     Receipt retVal = new Receipt();
     if (str?.isNotEmpty == true){
@@ -109,6 +157,7 @@ class ReceiptParser{
     }
     return retVal;
   }
+  */
 
   List<Map> getParsedTotalFromString(String str, String splitter){
     List<Map> retVal = new List<Map>();
@@ -169,6 +218,13 @@ class ReceiptParser{
     }
 
     if (regMMDDYYYY.hasMatch(s)){
+      return true;
+    }
+
+    if (regMMDDYY.hasMatch(s)){
+      return true;
+    }
+    if (regDDMMYY.hasMatch(s)){
       return true;
     }
     return isDate(s);
