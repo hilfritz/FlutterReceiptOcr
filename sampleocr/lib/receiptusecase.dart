@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sampleocr/Receipt.dart';
@@ -6,7 +8,8 @@ abstract class ReceiptUseCase{
   ReceiptUseCaseView view;
 
   void init(ReceiptUseCaseView view);
-  void run(VisionText visionText);
+  //void run(VisionText visionText);
+  void run(File file, TextRecognizer textRecognizer);
   void dispose();
 }
 abstract class ReceiptUseCaseView{
@@ -45,8 +48,10 @@ class ReceiptUseCaseImpl implements ReceiptUseCase{
   }
 
   @override
-  void run(VisionText visionText) {
+  void run(File image, TextRecognizer textRecognizer) async{
     view.showLoading();
+    FirebaseVisionImage visionImage = FirebaseVisionImage.fromFile(image);
+    final VisionText visionText = await textRecognizer.processImage(visionImage);
     Receipt receipt = receiptParser.getParsedReceiptFromVisionText(visionText);
     if (receipt==null){
       view.hideLoading();
@@ -87,6 +92,7 @@ class ReceiptUseCaseImpl implements ReceiptUseCase{
       view.dateList.add(receipt.dateList);
     }
 
+    view.hideLoading();
 
   }
 
