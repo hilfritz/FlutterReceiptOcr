@@ -28,7 +28,10 @@ dependencies:
   jiffy: ^2.1.2
   rxdart: 0.21.0
   progress_dialog: ^1.2.0
-
+  autocomplete_textfield:
+    git:
+      url: https://github.com/hilfritz/flutter-autocomplete-textfield.git
+      ref: master
 dev_dependencies:
   flutter_test:
     sdk: flutter
