@@ -117,15 +117,20 @@ class ReceiptUseCaseImpl implements ReceiptUseCase{
 
     if (receipt.priceList.isNotEmpty){
       //view.priceList.add(receipt.priceList);
+
+
+      //receipt.priceList = receipt.priceList.where((item) => filter(item.length>1)).toList();
       view.priceList.addAll(receipt.priceList);
     }
 
     if (receipt.nameList.isNotEmpty){
       //view.nameList.add(receipt.nameList);
+      receipt.nameList = receipt.nameList.where((f) => f.length>1).toList();
       view.nameList.addAll(receipt.nameList);
     }
 
     if (receipt.dateList.isNotEmpty){
+      receipt.dateList = receipt.dateList.where((f) => f.length>5).toList();
       view.dateList.addAll(receipt.dateList);
       //view.dateListTemp.addAll(receipt.dateList);
 

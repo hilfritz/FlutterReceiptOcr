@@ -463,10 +463,14 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
   }
 
   @override
-  void showSelectDatePopup(List<String> dateList, TextFieldType type) async{
+  void showSelectDatePopup(List<String> list, TextFieldType type) async{
+    String description = "Type";
+    if (list!=null && list.length > 0){
+      description = "Type or Select from below";
+    }
     var cd = CustomDialog(
       title: "Receipt Date",
-      description: "Type or Select Date Below",
+      description: description,
       buttonText: "PROCEED",
       shorterDimention: ViewUtil.instance.displayShorterDimension,
       callback: (String val){
@@ -476,9 +480,12 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
 
         print("showSelectDatePopup: selectedDate: "+selectedDate);
       },
-      suggestions: dateList,
+      suggestions: list,
       type: type,
       selectedValue: selectedDate,
+      hideKeyboard: (){
+        hideKeyboard();
+      },
     );
     showDialog(context: context,
         builder: (BuildContext context){
@@ -490,9 +497,13 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
 
   @override
   void showSelectNamePopup(List<String> list, TextFieldType type) async{
+    String description = "Type";
+    if (list!=null && list.length > 0){
+      description = "Type or Select from below";
+    }
     var cd = CustomDialog(
       title: "Remark",
-      description: "Type or Select Remark Below",
+      description: description,
       buttonText: "PROCEED",
       shorterDimention: ViewUtil.instance.displayShorterDimension,
       callback: (String val){
@@ -504,6 +515,9 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
       suggestions: list,
       type: type,
       selectedValue: selectedName,
+      hideKeyboard: (){
+        hideKeyboard();
+      },
     );
     showDialog(context: context,
         builder: (BuildContext context){
@@ -515,9 +529,13 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
 
   @override
   void showSelectPricePopup(List<String> list, TextFieldType type) async {
+    String description = "Type";
+    if (list!=null && list.length > 0){
+      description = "Type or Select from below";
+    }
     var cd = CustomDialog(
-      title: "Total Price",
-      description: "Type or Select Price Below",
+      title: "Total Amount",
+      description: description,
       buttonText: "PROCEED",
       shorterDimention: ViewUtil.instance.displayShorterDimension,
       callback: (String val){
@@ -530,6 +548,9 @@ class _MyHomePageState extends State<MyHomePage> implements ReceiptUseCaseView{
       suggestions: list,
       type: type,
       selectedValue: selectedPrice,
+      hideKeyboard: (){
+        hideKeyboard();
+      },
     );
     showDialog(context: context,
         builder: (BuildContext context){

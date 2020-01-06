@@ -15,6 +15,7 @@ class CustomDialog extends StatelessWidget {
 
   final TextFieldType type;
   BuildContext context;
+  final Function hideKeyboard;
 
   GlobalKey<AutoCompleteTextFieldState<String>> autoCompleteGlobalKey = new GlobalKey();
 
@@ -26,14 +27,16 @@ class CustomDialog extends StatelessWidget {
     @required this.callback,
     @required this.suggestions,
     @required this.type,
-    @required this.selectedValue
+    @required this.selectedValue,
+    @required this.hideKeyboard
   }
   );
 
   String selectedValue;
-  AutoCompleteTextField<String> textField;
+  //AutoCompleteTextField<String> textField;
   TextEditingController controller = new TextEditingController();
 
+  /*
   void init(){
       textField = new AutoCompleteTextField<String>(
         controller: controller,
@@ -64,6 +67,8 @@ class CustomDialog extends StatelessWidget {
 
   }
 
+   */
+
 
   Widget getSuggestionsListView(List<String> list, TextEditingController controller){
     if (list==null || list.isEmpty){
@@ -76,22 +81,27 @@ class CustomDialog extends StatelessWidget {
       var itemWidget = Padding(
           child:  new Text(text, style: Theme.of(context).textTheme.subhead),
           padding: EdgeInsets.all(5.0));
-      var gesture = GestureDetector(
-        onTap: (){
-          selectedValue = text;
-          controller.text = selectedValue;
-        },
-        child: itemWidget,
-      );
+
       var column = Column(
         children: <Widget>[
-          gesture,
+          itemWidget,
           Divider(
             color: Colors.black38,
           ),
         ],
       );
-      listWidget.add(column);
+      var gesture = GestureDetector(
+        onTap: (){
+          if (text!=null){
+            selectedValue = text;
+            controller.text = selectedValue;
+          }
+          hideKeyboard();
+        },
+        child: column,
+      );
+
+      listWidget.add(gesture);
     }
     return Scrollbar(
       child: new Container(
@@ -113,19 +123,22 @@ class CustomDialog extends StatelessWidget {
 
   }
 
-
   Widget getSimpleTextField(List<String> list, TextEditingController controller, String description, TextFieldType type){
+    Widget dropdown = Container();
+    if (list!=null && list.length>0){
+      dropdown =  Align(
+        alignment: Alignment.bottomRight,
+        child: Icon(
+          Icons.arrow_drop_down,
+          color: Colors.black,
+          size: 24.0,
+        ),
+      );
+    }
+
     return Stack(
       children: <Widget>[
-        Align(
-          alignment: Alignment.bottomRight,
-          child: Icon(
-            Icons.arrow_drop_down,
-            color: Colors.black,
-            size: 24.0,
-          ),
-        ),
-
+        dropdown,
         Container(
           width: ViewUtil.instance.displayShorterDimension * 0.7,
           child: getTextFieldByTextFieldType(type, controller, description),
@@ -151,7 +164,7 @@ class CustomDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     this.context = context;
-    init();
+    //init();
     if (selectedValue!=null && selectedValue.isNotEmpty){
       controller.text =  selectedValue;
     }
@@ -324,7 +337,7 @@ class CustomDialog extends StatelessWidget {
   }
 
   void dispose(){
-    controller.clear();
+    controller?.clear();
     controller = null;
   }
 }
