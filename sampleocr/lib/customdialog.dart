@@ -177,6 +177,7 @@ class CustomDialog extends StatelessWidget {
       ),
       elevation: 0.0,
       backgroundColor: Colors.transparent,
+      child: SingleChildScrollView(
       child: Container(
         width: shorterDimention * 0.5,
         padding: EdgeInsets.all(20),
@@ -224,6 +225,7 @@ class CustomDialog extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
     //return dialog;
     return dialog;
